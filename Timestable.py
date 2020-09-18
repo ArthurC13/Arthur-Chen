@@ -12,12 +12,9 @@ def input_number(text):                                                         
             return input_number(text)
     else:                                                                                                   #output a message if the number is not valid
         print("Please enter a valid number")
-<<<<<<< Updated upstream
-        return input_number(text)
-# end function
-=======
         return input_number(text)                                                                           #recall input_number so the user can re-enter a number
->>>>>>> Stashed changes
+
+#end function
 
 def verify(n):                                                                                              #function for verification
     text = "Do you mean " + str(n) + " ? Enter Y/N: "
@@ -29,6 +26,7 @@ def verify(n):                                                                  
     else:                                                                                                   #recall verify if the input is neither Y or N - allow user to re-enter a choice
         print("Please enter Y or N")
         return verify(n)
+    
 # end function
 
 num = input_number("Please enter a number between 1 to 20 to display its timestable: ")                     #ask for the number
