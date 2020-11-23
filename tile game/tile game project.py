@@ -84,31 +84,35 @@ class player(pygame.sprite.Sprite):
         self.rect.x = 360
         self.rect.y = 360
     def update(self):
-        if not pygame.sprite.spritecollide(self, outerwall_group, False):
+        x_speed = 0
+        y_speed = 0
+        if not pygame.sprite.spritecollide(self, unbreakable_wall_group, False):
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP]:
-                self.rect.y -= self.speed
+                y_speed = -self.speed
                 self.last_action = 'u'
             elif keys[pygame.K_LEFT]:
-                self.rect.x -= self.speed
+                x_speed = -self.speed
                 self.last_action = 'l'
             elif keys[pygame.K_DOWN]:
-                self.rect.y += self.speed
+                y_speed = self.speed
                 self.last_action = 'd'
             elif keys[pygame.K_RIGHT]:
-                self.rect.x += self.speed
+                x_speed = self.speed
                 self.last_action = 'r'
         else:
             if self.last_action == 'u':
-                self.rect.y += self.speed
+                y_speed = self.speed
             elif self.last_action == 'l':
-                self.rect.x += self.speed
+                x_speed = self.speed
             elif self.last_action == 'd':
-                self.rect.y -= self.speed
+                y_speed = -self.speed
             else:
-                self.rect.x -= self.speed
+                x_speed = -self.speed
+        self.rect.x += x_speed
+        self.rect.y += y_speed
 
-class outerwall(pygame.sprite.Sprite):
+class unbreakable_wall(pygame.sprite.Sprite):
     #define the constructor for player
     def __init__(self, colour, width, height, x, y):
         #call the sprite constructor
@@ -123,10 +127,10 @@ class outerwall(pygame.sprite.Sprite):
 
 #create a list of all sprites
 all_sprites_group = pygame.sprite.Group()
-outerwall_group = pygame.sprite.Group()
+unbreakable_wall_group = pygame.sprite.Group()
 
 #create objects
-player = player(BLUE, 20, 20, 2)
+player = player(BLUE, 20, 20, 3)
 all_sprites_group.add(player)
 
 #draw map
@@ -136,9 +140,9 @@ y = 0
 for line in maplist:
     for i in line:
         if i == '1':
-            mywall = outerwall(RED, 30, 30, x, y)
+            mywall = unbreakable_wall(RED, 30, 30, x, y)
             all_sprites_group.add(mywall)
-            outerwall_group.add(mywall)
+            unbreakable_wall_group.add(mywall)
         x += 30
     y += 30
     x = 0
