@@ -26,7 +26,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 100
+level = 10
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -56,34 +56,6 @@ gamemap = '''1111111111111111111111111
 1111111111111111111111111
 '''
 
-gamemap2 = '''
-1111111111111111111111111
-1000010010000001000100001
-1000001000000000010000001
-1110000101100000000010001
-1010100010000010101111001
-1100001101101000100000001
-1001101000100000000000111
-1001010000000011111001101
-1000000000000001000000001
-1011100000000010010110011
-1110001001000010000000101
-1000001100001000000010101
-1000001010102000100000011
-1100100000010000000000001
-1000010000110000001000011
-1000000000000000010010101
-1000011011100010001000001
-1100000000000100010101101
-1100100000000010001000001
-1011101010001101000010111
-1000000000100011001111001
-1000000001011100000001101
-1000001000111100000001001
-1100101001000011000000011
-1111111111111111111111111
-'''
-
 def makemap():
     string = ''
     enemycount = 0
@@ -96,7 +68,7 @@ def makemap():
                     string += '1'
                 elif line == 12 and i == 12:
                     string += '2'
-                elif random.randint(0, 25) == 5 and enemycount < level:
+                elif random.randint(0, 50) == 25 and enemycount < level:
                     enemycount += 1
                     string += '9'
                 elif random.randint(0, 3) == 0:
@@ -200,7 +172,7 @@ class enemy(pygame.sprite.Sprite):
             elif self.rect.x >= player.rect.x:
                 x_speed = -self.speed
                 self.last_action = 'l'
-            elif self.rect.x < player.rect.x and player.rect.x - self.rect.x > 10:
+            elif self.rect.x < player.rect.x and player.rect.x - self.rect.x > 3:
                 x_speed = self.speed
                 self.last_action = 'r'
             elif self.rect.y < player.rect.y:
@@ -232,28 +204,30 @@ all_sprites_group.add(player)
 player_group.add(player)
 
 #draw map
-maplist = makemap().split('\n')
-x = 0
-y = 0
-for line in maplist:
-    for i in line:
-        if i == '1':
-            mywall = unbreakable_wall(PURPLE, 30, 30, x, y)
-            all_sprites_group.add(mywall)
-            unbreakable_wall_group.add(mywall)
-        if i == '2':
-            mywall = unbreakable_wall(YELLOW, 30, 30, x, y)
-            all_sprites_group.add(mywall)
-        if i == '9':
-            mywall = unbreakable_wall(PINK, 30, 30, x, y)
-            enemy_base_group.add(mywall)
-            all_sprites_group.add(mywall)
-            myenemy = enemy(RED, 20, 20, 2, x+6, y+5)
-            enemies_group.add(myenemy)
-            all_sprites_group.add(myenemy)
-        x += 30
-    y += 30
+def draw_map(maptext):
+    maplist = maptext.split('\n')
     x = 0
+    y = 0
+    for line in maplist:
+        for i in line:
+            if i == '1':
+                mywall = unbreakable_wall(PURPLE, 30, 30, x, y)
+                all_sprites_group.add(mywall)
+                unbreakable_wall_group.add(mywall)
+            if i == '2':
+                mywall = unbreakable_wall(YELLOW, 30, 30, x, y)
+                all_sprites_group.add(mywall)
+            if i == '9':
+                mywall = unbreakable_wall(PINK, 30, 30, x, y)
+                enemy_base_group.add(mywall)
+                all_sprites_group.add(mywall)
+                myenemy = enemy(RED, 20, 20, 2, x+6, y+5)
+                enemies_group.add(myenemy)
+                all_sprites_group.add(myenemy)
+            x += 30
+        y += 30
+        x = 0
+draw_map(makemap())
 
 # -- Exit game flag set to false
 done = False
@@ -286,6 +260,9 @@ while not done:
         player.health -= 10
         healthtext = 'Health: ' + str(player.health)
         textlayer2 = myfont.render(healthtext, False, WHITE)
+        player.score += 10
+        scoretext = 'Score: ' + str(player.score)
+        textlayer3 = myfont.render(scoretext, False, WHITE)
 
     # -- Screen background is BLACK
     screen.fill(BLACK)
