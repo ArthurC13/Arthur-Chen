@@ -161,34 +161,44 @@ class enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.spawn_x = x
+        self.spawn_y = y
+        self.last_time = pygame.time.get_ticks()
+        self.spawntime = 1500
     def update(self):
+        now = pygame.time.get_ticks()
         x_speed = 0
         y_speed = 0
-        if not pygame.sprite.spritecollide(self, unbreakable_wall_group, False):
-            keys = pygame.key.get_pressed()
-            if self.rect.y >= player.rect.y:
-                y_speed = -self.speed
-                self.last_action = 'u'
-            elif self.rect.x >= player.rect.x:
-                x_speed = -self.speed
-                self.last_action = 'l'
-            elif self.rect.x < player.rect.x and player.rect.x - self.rect.x > 3:
-                x_speed = self.speed
-                self.last_action = 'r'
-            elif self.rect.y < player.rect.y:
-                y_speed = self.speed
-                self.last_action = 'd'
-        else:
-            if self.last_action == 'u':
-                y_speed = self.speed
-            elif self.last_action == 'l':
-                x_speed = self.speed
-            elif self.last_action == 'd':
-                y_speed = -self.speed
+        if now - self.last_time >= self.spawntime:
+            if not pygame.sprite.spritecollide(self, unbreakable_wall_group, False):
+                keys = pygame.key.get_pressed()
+                if self.rect.y >= player.rect.y:
+                    y_speed = -self.speed
+                    self.last_action = 'u'
+                elif self.rect.x >= player.rect.x:
+                    x_speed = -self.speed
+                    self.last_action = 'l'
+                elif self.rect.x < player.rect.x and player.rect.x - self.rect.x > 3:
+                    x_speed = self.speed
+                    self.last_action = 'r'
+                elif self.rect.y < player.rect.y:
+                    y_speed = self.speed
+                    self.last_action = 'd'
             else:
-                x_speed = -self.speed
-        self.rect.x += x_speed
-        self.rect.y += y_speed
+                if self.last_action == 'u':
+                    y_speed = self.speed
+                elif self.last_action == 'l':
+                    x_speed = self.speed
+                elif self.last_action == 'd':
+                    y_speed = -self.speed
+                else:
+                    x_speed = -self.speed
+            self.rect.x += x_speed
+            self.rect.y += y_speed
+        if pygame.sprite.spritecollide(self, safe_zone_group, False):
+            self.rect.x = self.spawn_x
+            self.rect.y = self.spawn_y
+            self.last_time = pygame.time.get_ticks()
         
 
 #create a list of all sprites
@@ -197,6 +207,7 @@ unbreakable_wall_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
 enemy_base_group = pygame.sprite.Group()
+safe_zone_group = pygame.sprite.Group()
 
 #create objects
 player = player(BLUE, 20, 20, 3)
@@ -216,6 +227,7 @@ def draw_map(maptext):
                 unbreakable_wall_group.add(mywall)
             if i == '2':
                 mywall = unbreakable_wall(YELLOW, 30, 30, x, y)
+                safe_zone_group.add(mywall)
                 all_sprites_group.add(mywall)
             if i == '9':
                 mywall = unbreakable_wall(PINK, 30, 30, x, y)
