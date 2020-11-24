@@ -26,7 +26,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 1
+level = 40
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -96,7 +96,7 @@ def makemap():
                     string += '1'
                 elif line == 12 and i == 12:
                     string += '2'
-                elif random.randint(0, 10) == 5 and enemycount < level:
+                elif random.randint(0, 25) == 5 and enemycount < level:
                     enemycount += 1
                     string += '9'
                 elif random.randint(0, 3) == 0:
@@ -154,6 +154,7 @@ class player(pygame.sprite.Sprite):
                 x_speed = -self.speed
         self.rect.x += x_speed
         self.rect.y += y_speed
+            
 
 class unbreakable_wall(pygame.sprite.Sprite):
     #define the constructor for player
@@ -220,7 +221,7 @@ player_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
 
 #create objects
-player = player(BLUE, 20, 20, 4)
+player = player(BLUE, 20, 20, 3)
 all_sprites_group.add(player)
 player_group.add(player)
 
@@ -240,9 +241,9 @@ for line in maplist:
         if i == '9':
             mywall = unbreakable_wall(PINK, 30, 30, x, y)
             all_sprites_group.add(mywall)
-            enemy = enemy(RED, 20, 20, 2, x+6, y+5)
-            enemies_group.add(enemy)
-            all_sprites_group.add(enemy)
+            myenemy = enemy(RED, 20, 20, 2, x+6, y+5)
+            enemies_group.add(myenemy)
+            all_sprites_group.add(myenemy)
         x += 30
     y += 30
     x = 0
@@ -274,7 +275,10 @@ while not done:
     #Next event
 
     # -- game logic goes after this comment
-    
+    if pygame.sprite.spritecollide(player, enemies_group, False):
+        player.health -= 1
+        healthtext = 'Health: ' + str(player.health)
+        textlayer2 = myfont.render(healthtext, False, WHITE)
 
     # -- Screen background is BLACK
     screen.fill(BLACK)
