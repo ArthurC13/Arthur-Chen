@@ -26,7 +26,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 40
+level = 100
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -163,11 +163,16 @@ class unbreakable_wall(pygame.sprite.Sprite):
         super().__init__()
         #create a sprite and fill it with colour
         self.image = pygame.Surface([width,height])
+        self.colour = colour
         self.image.fill(colour)
         #set the position of the sprite
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+    def update(self):
+        if self.colour == PINK and pygame.sprite.spritecollide(self, player_group, False):
+            self.colour = GREEN
+            self.image.fill(self.colour)
 
 class enemy(pygame.sprite.Sprite):
     #define the constructor for player
@@ -219,6 +224,7 @@ all_sprites_group = pygame.sprite.Group()
 unbreakable_wall_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
+enemy_base_group = pygame.sprite.Group()
 
 #create objects
 player = player(BLUE, 20, 20, 3)
@@ -240,6 +246,7 @@ for line in maplist:
             all_sprites_group.add(mywall)
         if i == '9':
             mywall = unbreakable_wall(PINK, 30, 30, x, y)
+            enemy_base_group.add(mywall)
             all_sprites_group.add(mywall)
             myenemy = enemy(RED, 20, 20, 2, x+6, y+5)
             enemies_group.add(myenemy)
@@ -275,8 +282,8 @@ while not done:
     #Next event
 
     # -- game logic goes after this comment
-    if pygame.sprite.spritecollide(player, enemies_group, False):
-        player.health -= 1
+    if pygame.sprite.spritecollide(player, enemies_group, True):
+        player.health -= 10
         healthtext = 'Health: ' + str(player.health)
         textlayer2 = myfont.render(healthtext, False, WHITE)
 
