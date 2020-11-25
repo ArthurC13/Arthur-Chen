@@ -27,7 +27,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 10
+level = 2
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -131,7 +131,8 @@ class player(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, safe_zone_group, False):
             global basecount
             if basecount == 0:
-                draw_map()
+                pass
+                #draw_map(makemap())
         self.rect.x += x_speed
         self.rect.y += y_speed
             
