@@ -323,6 +323,7 @@ while not done:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 level -= 1
+                player.score -= level*100
                 player.new_level()
         #End If
     #Next event
