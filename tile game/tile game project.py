@@ -27,7 +27,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 2
+level = 1
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -131,12 +131,27 @@ class player(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, safe_zone_group, False):
             global basecount
             if basecount == 0:
-                pass
-                #draw_map(makemap())
+                self.new_level()
         self.rect.x += x_speed
         self.rect.y += y_speed
+    def respawn(self):
+        self.rect.x = 365
+        self.rect.y = 365
+    def new_level(self):
+        global basecount
+        global level
+        global textlayer1
+        all_sprites_group.empty()
+        all_sprites_group.add(self)
+        unbreakable_wall_group.empty()
+        enemies_group.empty()
+        enemy_base_group.empty()
+        safe_zone_group.empty()
+        self.respawn()
+        level += 1
+        basecount = draw_map(makemap())
+        update_scoreboard()
             
-
 class tile(pygame.sprite.Sprite):
     #define the constructor for player
     def __init__(self, colour, width, height, x, y):
@@ -156,7 +171,7 @@ class tile(pygame.sprite.Sprite):
             self.colour = GREEN
             self.image.fill(self.colour)
             basecount -= 1
-            print(basecount)
+            update_scoreboard()
 
 class enemy(pygame.sprite.Sprite):
     #define the constructor for player
@@ -277,14 +292,21 @@ done = False
 clock = pygame.time.Clock()
 
 #scoreboard
-leveltext = 'Level: ' + str(level)
-textlayer1 = myfont.render(leveltext, False, WHITE)
-healthtext = 'Health: ' + str(player.health)
-textlayer2 = myfont.render(healthtext, False, WHITE)
-scoretext = 'Score: ' + str(player.score)
-textlayer3 = myfont.render(scoretext, False, WHITE)
-keystext = 'Keys: ' + str(player.keys)
-textlayer4 = myfont.render(keystext, False, WHITE)
+def update_scoreboard():
+    global level, basecount
+    global textlayer1
+    global textlayer2
+    global textlayer3
+    global textlayer4
+    leveltext = 'Level: ' + str(level)
+    textlayer1 = myfont.render(leveltext, False, WHITE)
+    healthtext = 'Health: ' + str(player.health)
+    textlayer2 = myfont.render(healthtext, False, WHITE)
+    scoretext = 'Score: ' + str(player.score)
+    textlayer3 = myfont.render(scoretext, False, WHITE)
+    keystext = 'Keys left: ' + str(basecount)
+    textlayer4 = myfont.render(keystext, False, WHITE)
+update_scoreboard()
 
 ### -- Game Loop
 
@@ -300,11 +322,8 @@ while not done:
     contactenemies = pygame.sprite.spritecollide(player, enemies_group, False)
     if contactenemies:
         player.health -= 10
-        healthtext = 'Health: ' + str(player.health)
-        textlayer2 = myfont.render(healthtext, False, WHITE)
         player.score += 10
-        scoretext = 'Score: ' + str(player.score)
-        textlayer3 = myfont.render(scoretext, False, WHITE)
+        update_scoreboard()
         for i in contactenemies:
             i.respawn()
 
