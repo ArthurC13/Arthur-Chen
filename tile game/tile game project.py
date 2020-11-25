@@ -27,7 +27,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 1
+level = 1000
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -69,7 +69,7 @@ def makemap():
                     string += '1'
                 elif line == 12 and i == 12:
                     string += '2'
-                elif random.randint(0, 50) == 25 and enemycount < level:
+                elif random.randint(0, 50) == 0 and enemycount < level:
                     enemycount += 1
                     string += '9'
                 elif random.randint(0, 3) == 0:
@@ -91,14 +91,14 @@ class player(pygame.sprite.Sprite):
         self.image = pygame.Surface([width,height])
         self.image.fill(colour)
         #set the position of the sprite
+        self.rect = self.image.get_rect()
+        self.rect.x = 365
+        self.rect.y = 365
+        #set variables
         self.speed = speed
         self.last_action = 'r'
         self.health = 100
         self.score = 0
-        self.keys = 0
-        self.rect = self.image.get_rect()
-        self.rect.x = 365
-        self.rect.y = 365
         self.first_move = False
     def update(self):
         x_speed = 0
@@ -138,15 +138,14 @@ class player(pygame.sprite.Sprite):
         self.rect.x = 365
         self.rect.y = 365
     def new_level(self):
-        global basecount
-        global level
-        global textlayer1
+        global basecount, textlayer1, level
         all_sprites_group.empty()
         all_sprites_group.add(self)
         unbreakable_wall_group.empty()
         enemies_group.empty()
         enemy_base_group.empty()
         safe_zone_group.empty()
+        self.first_move = False
         self.respawn()
         self.score += level*100
         level += 1
@@ -185,14 +184,15 @@ class enemy(pygame.sprite.Sprite):
         self.colour = colour
         self.image.fill(colour)
         #set the position of the sprite
-        self.speed = speed
-        self.last_action = 'r'
-        self.health = 100
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        #set variables
         self.spawn_x = x
         self.spawn_y = y
+        self.speed = speed
+        self.last_action = 'r'
+        self.health = 100
         self.last_time = pygame.time.get_ticks()
         self.spawntime = 1500
         self.last_flash = pygame.time.get_ticks()
@@ -295,11 +295,7 @@ clock = pygame.time.Clock()
 
 #scoreboard
 def update_scoreboard():
-    global level, basecount
-    global textlayer1
-    global textlayer2
-    global textlayer3
-    global textlayer4
+    global level, basecount, textlayer1, textlayer2, textlayer3, textlayer4
     leveltext = 'Level: ' + str(level)
     textlayer1 = myfont.render(leveltext, False, WHITE)
     healthtext = 'Health: ' + str(player.health)
@@ -349,9 +345,9 @@ while not done:
     screen.blit(textlayer2,(760,50))
     screen.blit(textlayer3,(760,90))
     screen.blit(textlayer4,(760,130))
-    screen.blit(textlayer5,(760,410))
-    screen.blit(textlayer6,(760,450))
-    screen.blit(textlayer7,(760,490))
+    screen.blit(textlayer5,(760,610))
+    screen.blit(textlayer6,(760,650))
+    screen.blit(textlayer7,(760,690))
 
     # -- flip display to reveal new position of objects
     pygame.display.flip()
