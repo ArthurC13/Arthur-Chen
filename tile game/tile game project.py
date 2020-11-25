@@ -148,6 +148,7 @@ class player(pygame.sprite.Sprite):
         enemy_base_group.empty()
         safe_zone_group.empty()
         self.respawn()
+        self.score += level*100
         level += 1
         basecount = draw_map(makemap())
         update_scoreboard()
@@ -171,6 +172,7 @@ class tile(pygame.sprite.Sprite):
             self.colour = GREEN
             self.image.fill(self.colour)
             basecount -= 1
+            player.score += 100
             update_scoreboard()
 
 class enemy(pygame.sprite.Sprite):
@@ -307,6 +309,9 @@ def update_scoreboard():
     keystext = 'Keys left: ' + str(basecount)
     textlayer4 = myfont.render(keystext, False, WHITE)
 update_scoreboard()
+textlayer5 = myfont.render("Press 'r' to", False, WHITE)
+textlayer6 = myfont.render("regenerate", False, WHITE)
+textlayer7 = myfont.render("level", False, WHITE)
 
 ### -- Game Loop
 
@@ -315,6 +320,10 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                level -= 1
+                player.new_level()
         #End If
     #Next event
 
@@ -339,6 +348,9 @@ while not done:
     screen.blit(textlayer2,(760,50))
     screen.blit(textlayer3,(760,90))
     screen.blit(textlayer4,(760,130))
+    screen.blit(textlayer5,(760,410))
+    screen.blit(textlayer6,(760,450))
+    screen.blit(textlayer7,(760,490))
 
     # -- flip display to reveal new position of objects
     pygame.display.flip()
