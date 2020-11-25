@@ -128,6 +128,10 @@ class player(pygame.sprite.Sprite):
                 x_speed = -self.speed
         if not self.first_move and (x_speed != 0 or y_speed != 0):
             self.first_move = True
+        if pygame.sprite.spritecollide(self, safe_zone_group, False):
+            global basecount
+            if basecount == 0:
+                draw_map()
         self.rect.x += x_speed
         self.rect.y += y_speed
             
@@ -147,8 +151,11 @@ class tile(pygame.sprite.Sprite):
         self.rect.y = y
     def update(self):
         if self.colour == PINK and pygame.sprite.spritecollide(self, player_group, False):
+            global basecount
             self.colour = GREEN
             self.image.fill(self.colour)
+            basecount -= 1
+            print(basecount)
 
 class enemy(pygame.sprite.Sprite):
     #define the constructor for player
