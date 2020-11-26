@@ -28,7 +28,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 1
+level = 20
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -78,6 +78,8 @@ def makemap():
                 else:
                     string += '0'
         string += '\n'
+    if enemyneeded != 0:
+        return(makemap())
     return(string[:-1])
 print(makemap())
             
