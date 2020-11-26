@@ -1,8 +1,8 @@
 import pygame
 import random
+import math
 
 # -- Global Constants
-
 
 # -- Colours
 BLACK = (0,0,0)
@@ -14,6 +14,7 @@ YELLOW = (255,255,0)
 PURPLE = (103,13,173)
 PINK = (255,192,203)
 LIGHTPINK = (239, 154, 154)
+LIGHTBLUE = (209, 237, 242)
 
 # -- Initialise Pygame
 pygame.init()
@@ -27,7 +28,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 1000
+level = 1
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -59,7 +60,7 @@ gamemap = '''1111111111111111111111111
 
 def makemap():
     string = ''
-    enemycount = 0
+    enemyneeded = level
     for line in range(0, 25):
         if line in [0, 24]:
             string += '1111111111111111111111111'
@@ -69,8 +70,8 @@ def makemap():
                     string += '1'
                 elif line == 12 and i == 12:
                     string += '2'
-                elif random.randint(0, 50) == 0 and enemycount < level:
-                    enemycount += 1
+                elif random.randint(0, int(50*math.exp(-0.0693*line))) == 1 and enemyneeded > 0:
+                    enemyneeded -= 1
                     string += '9'
                 elif random.randint(0, 3) == 0:
                     string += '1'
@@ -90,6 +91,7 @@ class player(pygame.sprite.Sprite):
         #create a sprite and fill it with colour
         self.image = pygame.Surface([width,height])
         self.image.fill(colour)
+        self.colour = colour
         #set the position of the sprite
         self.rect = self.image.get_rect()
         self.rect.x = 365
@@ -100,34 +102,55 @@ class player(pygame.sprite.Sprite):
         self.health = 100
         self.score = 0
         self.first_move = False
+        self.last_spawn = pygame.time.get_ticks()
+        self.spawntime = 3000
+        self.last_flash = pygame.time.get_ticks()
+        self.flash = 150
     def update(self):
         x_speed = 0
         y_speed = 0
-        if not pygame.sprite.spritecollide(self, unbreakable_wall_group, False):
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_UP]:
-                y_speed = -self.speed
-                self.last_action = 'u'
-            elif keys[pygame.K_LEFT]:
-                x_speed = -self.speed
-                self.last_action = 'l'
-            elif keys[pygame.K_DOWN]:
-                y_speed = self.speed
-                self.last_action = 'd'
-            elif keys[pygame.K_RIGHT]:
-                x_speed = self.speed
-                self.last_action = 'r'
-        else:
-            if self.last_action == 'u':
-                y_speed = self.speed
-            elif self.last_action == 'l':
-                x_speed = self.speed
-            elif self.last_action == 'd':
-                y_speed = -self.speed
+        now = pygame.time.get_ticks()
+        if now - self.last_spawn >= self.spawntime:
+            self.image.fill(BLUE)
+            if not pygame.sprite.spritecollide(self, unbreakable_wall_group, False):
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_UP]:
+                    y_speed = -self.speed
+                    self.last_action = 'u'
+                elif keys[pygame.K_LEFT]:
+                    x_speed = -self.speed
+                    self.last_action = 'l'
+                elif keys[pygame.K_DOWN]:
+                    y_speed = self.speed
+                    self.last_action = 'd'
+                elif keys[pygame.K_RIGHT]:
+                    x_speed = self.speed
+                    self.last_action = 'r'
             else:
-                x_speed = -self.speed
+                if self.last_action == 'u':
+                    y_speed = self.speed
+                elif self.last_action == 'l':
+                    x_speed = self.speed
+                elif self.last_action == 'd':
+                    y_speed = -self.speed
+                else:
+                    x_speed = -self.speed
+        elif now - self.last_flash >= self.flash:
+            if self.colour == BLUE:
+                self.colour = LIGHTBLUE
+            else:
+                self.colour = BLUE
+            self.image.fill(self.colour)
+            self.last_flash = pygame.time.get_ticks()
         if not self.first_move and (x_speed != 0 or y_speed != 0):
             self.first_move = True
+        contactenemies = pygame.sprite.spritecollide(self, enemies_group, False)
+        for i in contactenemies:
+            if not i.spawn:
+                self.health -= 10
+                self.score += 10
+                update_scoreboard()
+            i.respawn()
         if pygame.sprite.spritecollide(self, safe_zone_group, False):
             global basecount
             if basecount == 0:
@@ -135,6 +158,8 @@ class player(pygame.sprite.Sprite):
         self.rect.x += x_speed
         self.rect.y += y_speed
     def respawn(self):
+        self.last_spawn = pygame.time.get_ticks()
+        self.last_flash = pygame.time.get_ticks()
         self.rect.x = 365
         self.rect.y = 365
     def new_level(self):
@@ -197,12 +222,14 @@ class enemy(pygame.sprite.Sprite):
         self.spawntime = 1500
         self.last_flash = pygame.time.get_ticks()
         self.flash = 150
+        self.spawn = True
     def update(self):
         now = pygame.time.get_ticks()
         x_speed = 0
         y_speed = 0
         if now - self.last_time >= self.spawntime and player.first_move:
             self.image.fill(RED)
+            self.spawn = False
             if not pygame.sprite.spritecollide(self, unbreakable_wall_group, False):
                 keys = pygame.key.get_pressed()
                 if self.rect.y >= player.rect.y:
@@ -240,6 +267,7 @@ class enemy(pygame.sprite.Sprite):
     def respawn(self):
         self.rect.x = self.spawn_x
         self.rect.y = self.spawn_y
+        self.spawn = True
         self.last_time = pygame.time.get_ticks()
         
 
@@ -325,13 +353,6 @@ while not done:
     #Next event
 
     # -- game logic goes after this comment
-    contactenemies = pygame.sprite.spritecollide(player, enemies_group, False)
-    if contactenemies:
-        player.health -= 10
-        player.score += 10
-        update_scoreboard()
-        for i in contactenemies:
-            i.respawn()
 
     # -- Screen background is BLACK
     screen.fill(BLACK)
