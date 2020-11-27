@@ -78,7 +78,6 @@ def makemap():
                 else:
                     string += '0'
         string += '\n'
-    enemyneeded = 0
     if enemyneeded != 0:
         return(makemap())
     return(string[:-1])
@@ -109,12 +108,14 @@ class player(pygame.sprite.Sprite):
         self.spawntime = 3000
         self.last_flash = pygame.time.get_ticks()
         self.flash = 150
+        self.invincible = True
+        self.last_invincible = pygame.time.get_ticks()
+        self.invincible_time = 3000
     def update(self):
         x_speed = 0
         y_speed = 0
         now = pygame.time.get_ticks()
         if now - self.last_spawn >= self.spawntime:
-            self.image.fill(BLUE)
             if not pygame.sprite.spritecollide(self, unbreakable_wall_group, False):
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_UP]:
@@ -138,20 +139,21 @@ class player(pygame.sprite.Sprite):
                     y_speed = -self.speed
                 else:
                     x_speed = -self.speed
-        elif now - self.last_flash >= self.flash:
-            if self.colour == BLUE:
-                self.colour = LIGHTBLUE
-            else:
-                self.colour = BLUE
-            self.image.fill(self.colour)
+        if now - self.last_flash >= self.flash and self.invincible:
+            self.flashing()
             self.last_flash = pygame.time.get_ticks()
+        if now - self.last_invincible >= self.invincible_time and self.invincible:
+            self.invincible = False
+            self.image.fill(BLUE)
         if not self.first_move and (x_speed != 0 or y_speed != 0):
             self.first_move = True
         contactenemies = pygame.sprite.spritecollide(self, enemies_group, False)
         for i in contactenemies:
-            if not i.spawn:
+            if not i.spawn and not self.invincible:
                 self.health -= 10
                 self.score += 10
+                self.invincible = True
+                self.last_invincible = pygame.time.get_ticks()
                 update_scoreboard()
             i.respawn()
         if pygame.sprite.spritecollide(self, safe_zone_group, False):
@@ -163,8 +165,17 @@ class player(pygame.sprite.Sprite):
     def respawn(self):
         self.last_spawn = pygame.time.get_ticks()
         self.last_flash = pygame.time.get_ticks()
+        self.first_move = False
+        self.invincible = True
+        self.last_invincible = pygame.time.get_ticks()
         self.rect.x = 365
         self.rect.y = 365
+    def flashing(self):
+        if self.colour == BLUE:
+            self.colour = LIGHTBLUE
+        else:
+            self.colour = BLUE
+        self.image.fill(self.colour)
     def new_level(self):
         global basecount, textlayer1, level
         all_sprites_group.empty()
@@ -173,7 +184,6 @@ class player(pygame.sprite.Sprite):
         enemies_group.empty()
         enemy_base_group.empty()
         safe_zone_group.empty()
-        self.first_move = False
         self.respawn()
         self.score += level*100
         level += 1
