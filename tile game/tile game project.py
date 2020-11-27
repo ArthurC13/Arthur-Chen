@@ -28,7 +28,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 1
+level = 10
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -327,7 +327,6 @@ def draw_map(maptext):
         x = 0
     return basecount
 basecount = draw_map(makemap())
-print(basecount)
 
 # -- Exit game flag set to false
 done = False
