@@ -78,6 +78,7 @@ def makemap():
                 else:
                     string += '0'
         string += '\n'
+    enemyneeded = 0
     if enemyneeded != 0:
         return(makemap())
     return(string[:-1])
@@ -176,6 +177,7 @@ class player(pygame.sprite.Sprite):
         self.respawn()
         self.score += level*100
         level += 1
+        self.health += 10
         basecount = draw_map(makemap())
         update_scoreboard()
             
@@ -350,6 +352,7 @@ while not done:
             if event.key == pygame.K_r:
                 level -= 1
                 player.score -= level*100
+                player.health -= 10
                 player.new_level()
         #End If
     #Next event
