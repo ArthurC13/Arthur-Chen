@@ -28,7 +28,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 10
+level = 1
 
 # -- Map
 gamemap = '''1111111111111111111111111
