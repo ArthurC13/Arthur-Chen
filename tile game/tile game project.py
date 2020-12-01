@@ -15,10 +15,12 @@ PURPLE = (103,13,173)
 PINK = (255,192,203)
 LIGHTPINK = (239, 154, 154)
 LIGHTBLUE = (209, 237, 242)
+BRIGHTBLUE = (15, 137, 202)
 
 # -- Initialise Pygame
 pygame.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
+myfont2 = pygame.font.SysFont('Comic Sans MS', 20)
 
 # -- Black Screen
 size = (950,750)
@@ -88,15 +90,14 @@ introtexts = '''Welcome to tile game!
 Use arrow keys to move arround
 Collect all keys from enemy bases(pink tiles)
 then return to your own base(yellow tiles)
-Enemies in red follows you and deals damage
-on contact
+Enemies in red follows you and deals damage on contact
 They cannot enter your base
-When hitted by an enemy, enemy respawn at
-their base and you gain invincibility for
-3 seconds
+When hitted by an enemy, enemy respawn at their
+base and you gain invincibility for 3 seconds
 
-If a stage is unplayable, press r to regenerate
-a new stage
+
+
+If a stage is unplayable, press r to regenerate a new stage
 
 Complete this stage and start you adventure!'''
             
@@ -355,11 +356,11 @@ done = False
 clock = pygame.time.Clock()
 
 #scoreboard
-def blit_texts(texts, colour, x, y, y_intervals):
+def blit_texts(texts, colour, x, y, y_intervals, font):
     textlist = texts.split('\n')
     counter = 0
     for line in textlist:
-        screen.blit(myfont.render(line, False, colour), (x, y + (y_intervals*counter)))
+        screen.blit(font.render(line, False, colour), (x, y + (y_intervals*counter)))
         counter += 1
 
 def update_scoreboard():
@@ -391,14 +392,14 @@ while not done:
 
     # -- Draw here
     if introduction:
-        blit_texts(introtexts, WHITE, 45, 45, 35)
+        blit_texts(introtexts, BRIGHTBLUE, 45, 45, 35, myfont2)
 
     all_sprites_group.draw(screen)
     enemies_group.draw(screen)
     player_group.draw(screen)
 
-    blit_texts(scoretexts, WHITE, 760, 10, 40)
-    blit_texts("Press 'r' to\nregenerate\nlevel", WHITE, 760, 630, 35)
+    blit_texts(scoretexts, WHITE, 760, 10, 40, myfont)
+    blit_texts("Press 'r' to\nregenerate\nlevel", WHITE, 760, 630, 35, myfont)
 
     # -- flip display to reveal new position of objects
     pygame.display.flip()
