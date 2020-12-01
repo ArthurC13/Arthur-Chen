@@ -28,7 +28,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('My Window')
 
 # -- variables
-level = 1
+level = 0
 
 # -- Map
 gamemap = '''1111111111111111111111111
@@ -70,7 +70,7 @@ def makemap():
                     string += '1'
                 elif line == 12 and i == 12:
                     string += '2'
-                elif random.randint(0, int(50*math.exp(-0.0693*line))) == 1 and enemyneeded > 0:
+                elif enemyneeded > 0 and random.randint(0, int(50*math.exp(-0.0693*line))) == 1:
                     enemyneeded -= 1
                     string += '9'
                 elif random.randint(0, 3) == 0:
@@ -81,13 +81,30 @@ def makemap():
     if enemyneeded != 0:
         return(makemap())
     return(string[:-1])
-print(makemap())
+
+# -- introduction
+introduction = True
+introtexts = '''Welcome to tile game!
+Use arrow keys to move arround
+Collect all keys from enemy bases(pink tiles)
+then return to your own base(yellow tiles)
+Enemies in red follows you and deals damage
+on contact
+They cannot enter your base
+When hitted by an enemy, enemy respawn at
+their base and you gain invincibility for
+3 seconds
+
+If a stage is unplayable, press r to regenerate
+a new stage
+
+Complete this stage and start you adventure!'''
             
 
 # -- Classes
 class player(pygame.sprite.Sprite):
     #define the constructor for player
-    def __init__(self, colour, width, height, speed):
+    def __init__(self, colour, width, height, speed, x, y):
         #call the sprite constructor
         super().__init__()
         #create a sprite and fill it with colour
@@ -96,8 +113,8 @@ class player(pygame.sprite.Sprite):
         self.colour = colour
         #set the position of the sprite
         self.rect = self.image.get_rect()
-        self.rect.x = 365
-        self.rect.y = 365
+        self.rect.x = x
+        self.rect.y = y
         #set variables
         self.speed = speed
         self.last_action = 'r'
@@ -177,7 +194,9 @@ class player(pygame.sprite.Sprite):
             self.colour = BLUE
         self.image.fill(self.colour)
     def new_level(self):
-        global basecount, textlayer1, level
+        global basecount, textlayer1, level, introduction
+        if introduction:
+            introduction = False
         all_sprites_group.empty()
         all_sprites_group.add(self)
         unbreakable_wall_group.empty()
@@ -294,7 +313,7 @@ enemy_base_group = pygame.sprite.Group()
 safe_zone_group = pygame.sprite.Group()
 
 #create objects
-player = player(BLUE, 20, 20, 3)
+player = player(BLUE, 20, 20, 3, 365, 365)
 all_sprites_group.add(player)
 player_group.add(player)
 
@@ -326,7 +345,8 @@ def draw_map(maptext):
         y += 30
         x = 0
     return basecount
-basecount = draw_map(makemap())
+#basecount = draw_map(makemap())
+basecount = draw_map(gamemap)
 
 # -- Exit game flag set to false
 done = False
@@ -335,20 +355,18 @@ done = False
 clock = pygame.time.Clock()
 
 #scoreboard
+def blit_texts(texts, colour, x, y, y_intervals):
+    textlist = texts.split('\n')
+    counter = 0
+    for line in textlist:
+        screen.blit(myfont.render(line, False, colour), (x, y + (y_intervals*counter)))
+        counter += 1
+
 def update_scoreboard():
-    global level, basecount, textlayer1, textlayer2, textlayer3, textlayer4
-    leveltext = 'Level: ' + str(level)
-    textlayer1 = myfont.render(leveltext, False, WHITE)
-    healthtext = 'Health: ' + str(player.health)
-    textlayer2 = myfont.render(healthtext, False, WHITE)
-    scoretext = 'Score: ' + str(player.score)
-    textlayer3 = myfont.render(scoretext, False, WHITE)
-    keystext = 'Keys left: ' + str(basecount)
-    textlayer4 = myfont.render(keystext, False, WHITE)
+    global level, basecount, scoretexts
+    scoretexts = 'Level: ' + str(level) + '\nHealth: ' + str(player.health) + '\nScore: ' + str(player.score) + '\nKeys left: ' + str(basecount)
+
 update_scoreboard()
-textlayer5 = myfont.render("Press 'r' to", False, WHITE)
-textlayer6 = myfont.render("regenerate", False, WHITE)
-textlayer7 = myfont.render("level", False, WHITE)
 
 ### -- Game Loop
 
@@ -357,7 +375,7 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN and not introduction:
             if event.key == pygame.K_r:
                 level -= 1
                 player.score -= level*100
@@ -372,17 +390,15 @@ while not done:
     screen.fill(BLACK)
 
     # -- Draw here
+    if introduction:
+        blit_texts(introtexts, WHITE, 45, 45, 35)
+
     all_sprites_group.draw(screen)
     enemies_group.draw(screen)
     player_group.draw(screen)
 
-    screen.blit(textlayer1,(760,10))
-    screen.blit(textlayer2,(760,50))
-    screen.blit(textlayer3,(760,90))
-    screen.blit(textlayer4,(760,130))
-    screen.blit(textlayer5,(760,610))
-    screen.blit(textlayer6,(760,650))
-    screen.blit(textlayer7,(760,690))
+    blit_texts(scoretexts, WHITE, 760, 10, 40)
+    blit_texts("Press 'r' to\nregenerate\nlevel", WHITE, 760, 630, 35)
 
     # -- flip display to reveal new position of objects
     pygame.display.flip()
