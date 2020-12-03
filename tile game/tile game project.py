@@ -33,7 +33,7 @@ pygame.display.set_caption('My Window')
 level = 0
 
 # -- Map
-gamemap = '''1111111111111111111111111
+intromap = '''1111111111111111111111111
 1000000000000000000000001
 1000000000000000000000901
 1000000000000000000000001
@@ -346,8 +346,7 @@ def draw_map(maptext):
         y += 30
         x = 0
     return basecount
-#basecount = draw_map(makemap())
-basecount = draw_map(gamemap)
+basecount = draw_map(intromap)
 
 # -- Exit game flag set to false
 done = False
