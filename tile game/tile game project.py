@@ -100,7 +100,7 @@ base and you gain invincibility for 3 seconds
 If a stage is unplayable, press r to regenerate a new stage
 
 Complete this stage and start you adventure!'''
-            
+        
 
 # -- Classes
 class player(pygame.sprite.Sprite):
@@ -318,6 +318,7 @@ player = player(BLUE, 20, 20, 3, 365, 365)
 all_sprites_group.add(player)
 player_group.add(player)
 
+
 #draw map
 def draw_map(maptext):
     maplist = maptext.split('\n')
@@ -348,12 +349,6 @@ def draw_map(maptext):
     return basecount
 basecount = draw_map(intromap)
 
-# -- Exit game flag set to false
-done = False
-
-# -- Manages how fast screen refreshes
-clock = pygame.time.Clock()
-
 #scoreboard
 def blit_texts(texts, colour, x, y, y_intervals, font):
     textlist = texts.split('\n')
@@ -367,6 +362,13 @@ def update_scoreboard():
     scoretexts = 'Level: ' + str(level) + '\nHealth: ' + str(player.health) + '\nScore: ' + str(player.score) + '\nKeys left: ' + str(basecount)
 
 update_scoreboard()
+
+# -- Exit game flag set to false
+done = False
+
+# -- Manages how fast screen refreshes
+clock = pygame.time.Clock()
+
 
 ### -- Game Loop
 
