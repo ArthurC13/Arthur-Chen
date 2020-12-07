@@ -17,6 +17,9 @@ LIGHTPINK = (239, 154, 154)
 LIGHTBLUE = (209, 237, 242)
 BRIGHTBLUE = (15, 137, 202)
 
+# -- variables
+level = 0
+
 # -- Initialise Pygame
 pygame.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
@@ -29,8 +32,6 @@ screen = pygame.display.set_mode(size)
 # -- Title of new window/screen
 pygame.display.set_caption('My Window')
 
-# -- variables
-level = 0
 
 # -- Map
 intromap = '''1111111111111111111111111
@@ -304,7 +305,7 @@ class enemy(pygame.sprite.Sprite):
         self.spawn = True
         self.last_time = pygame.time.get_ticks()
         
-
+#sprite groups
 #create a list of all sprites
 all_sprites_group = pygame.sprite.Group()
 unbreakable_wall_group = pygame.sprite.Group()
